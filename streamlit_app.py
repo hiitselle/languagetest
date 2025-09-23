@@ -1878,6 +1878,32 @@ def calculate_boulder_completion(row: pd.Series) -> Dict[str, any]:
     
     # Check for worst finish information
     worst_finish_display = ""
+    worst_finish_col = None
+    
+    # Look for worst finish column
+    for col in row.index:
+        if 'Worst Finish' in str(col):
+            worst_finish_col = col
+            break
+    
+    if worst_finish_col:
+        worst_finish = row.get(worst_finish_col, 'N/A')
+        if worst_finish not in ['N/A', '', None] and not pd.isna(worst_finish):
+            worst_finish_clean = DataProcessor.clean_text(str(worst_finish))
+            if worst_finish_clean and worst_finish_clean != '-':
+                worst_finish_display = f" | Worst Finish: {worst_finish_clean}"
+    
+    return {
+        'boulder_scores': boulder_scores,
+        'completed_boulders': completed_boulders,
+        'boulder_display': boulder_display,
+        'worst_finish_display': worst_finish_display
+    }
+    
+    boulder_display = " | ".join(boulder_scores) if boulder_scores else "No boulder data"
+    
+    # Check for worst finish information
+    worst_finish_display = ""
     if completed_boulders == 4:
         detail_text = f"{get_text('total')}: {total_score} | {boulder_display}{worst_finish_display}"
     elif completed_boulders == 3:
